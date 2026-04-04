@@ -1,0 +1,86 @@
+{
+  "name": "@webbers/invoices-medusa",
+  "version": "1.0.0",
+  "description": "Add invoices to Medusa v2",
+  "author": "Webbers B.V. <development@webbers.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/webbersagency/invoices-medusa"
+  },
+  "files": [
+    ".medusa/server"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    "./workflows": "./.medusa/server/src/workflows/index.js",
+    "./.medusa/server/src/modules/*": "./.medusa/server/src/modules/*/index.js",
+    "./modules/*": "./.medusa/server/src/modules/*/index.js",
+    "./modules/invoice/service": "./.medusa/server/src/modules/invoice/service.js",
+    "./providers/*": "./.medusa/server/src/providers/*/index.js",
+    "./types/*": "./.medusa/server/src/types/*/index.js",
+    "./links": "./.medusa/server/src/links/index.js",
+    "./admin": {
+      "import": "./.medusa/server/src/admin/index.mjs",
+      "require": "./.medusa/server/src/admin/index.js",
+      "default": "./.medusa/server/src/admin/index.js"
+    },
+    "./*": "./.medusa/server/src/*.js"
+  },
+  "keywords": [
+    "medusa-v2",
+    "medusa-plugin-integration",
+    "invoices",
+    "medusa-webbers"
+  ],
+  "scripts": {
+    "build": "medusa plugin:build",
+    "dev": "medusa plugin:develop",
+    "prepublishOnly": "medusa plugin:build"
+  },
+  "devDependencies": {
+    "@medusajs/admin-sdk": "^2.13.5",
+    "@medusajs/cli": "^2.13.5",
+    "@medusajs/framework": "^2.13.5",
+    "@medusajs/icons": "^2.13.5",
+    "@medusajs/medusa": "^2.13.5",
+    "@medusajs/test-utils": "^2.13.5",
+    "@medusajs/types": "^2.13.5",
+    "@medusajs/ui": "4.0.25",
+    "@swc/core": "^1.15.21",
+    "@types/node": "^20.19.37",
+    "@types/pdfmake": "^0.3.2",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.2.25",
+    "prop-types": "^15.8.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2",
+    "vite": "^5.2.11",
+    "yalc": "^1.0.0-pre.53"
+  },
+  "peerDependencies": {
+    "@medusajs/admin-sdk": "^2.13.3",
+    "@medusajs/cli": "^2.13.3",
+    "@medusajs/framework": "^2.13.3",
+    "@medusajs/icons": "^2.13.3",
+    "@medusajs/medusa": "^2.13.3",
+    "@medusajs/test-utils": "^2.13.3",
+    "@medusajs/ui": "4.0.25"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "dependencies": {
+    "@medusajs/admin-shared": "^2.13.5",
+    "@medusajs/dashboard": "^2.13.5",
+    "@medusajs/js-sdk": "^2.13.5",
+    "@tanstack/react-query": "5.64.2",
+    "date-fns": "^4.1.0",
+    "lodash.merge": "^4.6.2",
+    "pdfmake": "^0.3.7",
+    "react-i18next": "^15.7.4"
+  }
+}
