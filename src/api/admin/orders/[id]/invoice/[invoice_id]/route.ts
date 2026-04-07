@@ -18,10 +18,10 @@ export const GET = async (
 
   if (invoice.pdf_url) {
     const fileModuleService = req.scope.resolve(Modules.FILE)
-    const buffer = await fileModuleService.getAsBuffer(invoice.pdf_url)
+    const stream = await fileModuleService.getDownloadStream(invoice.pdf_url)
     res.contentType("application/pdf")
     res.attachment(`invoice-${invoice.display_id}.pdf`)
-    return res.send(buffer)
+    return stream.pipe(res)
   }
 
   // Fallback: generate on-demand for invoices created before storage upload was introduced

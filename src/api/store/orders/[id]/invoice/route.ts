@@ -25,10 +25,10 @@ export const GET = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) 
 
   if (debitInvoice?.pdf_url) {
     const fileModuleService = req.scope.resolve(Modules.FILE)
-    const buffer = await fileModuleService.getAsBuffer(debitInvoice.pdf_url)
+    const stream = await fileModuleService.getDownloadStream(debitInvoice.pdf_url)
     res.contentType("application/pdf")
     res.attachment(`invoice-${debitInvoice.display_id}.pdf`)
-    return res.send(buffer)
+    return stream.pipe(res)
   }
 
   // Fallback: generate on-demand for invoices created before storage upload was introduced
