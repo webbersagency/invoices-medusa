@@ -17,7 +17,7 @@ export const uploadInvoicePdfStep = createStep(
 
     const [file] = await fileModuleService.createFiles([
       {
-        filename: `invoices/${Date.now()}-${file_name}`,
+        filename: `invoices/${file_name}`,
         mimeType: "application/pdf",
         content: data,
         access: "private",
