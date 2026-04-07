@@ -1,6 +1,7 @@
 import {AuthenticatedMedusaRequest, MedusaResponse} from "@medusajs/framework/http"
 import {generateInvoicePdfWorkflow} from "../../../../../workflows/generate-invoice-pdf"
 import {ContainerRegistrationKeys, MedusaError, Modules} from "@medusajs/framework/utils"
+import {InvoiceDTO} from "../../../../../types"
 
 export const GET = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
   const {id} = req.params
@@ -20,14 +21,14 @@ export const GET = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) 
     filters: {id},
   })
 
-  const debitInvoice = orderData?.invoices?.find((inv: {type: string}) => inv.type === "debit") as
-    | {pdf_url?: string}
-    | undefined
+  const debitInvoice = orderData?.invoices?.find((inv: {type: string}) => inv.type === "debit") as InvoiceDTO | undefined
 
   if (debitInvoice?.pdf_url) {
     const fileModuleService = req.scope.resolve(Modules.FILE)
-    const file = await fileModuleService.retrieveFile(debitInvoice.pdf_url)
-    return res.redirect(file.url)
+    const buffer = await fileModuleService.getAsBuffer(debitInvoice.pdf_url)
+    res.contentType("application/pdf")
+    res.attachment(`invoice-${debitInvoice.display_id}.pdf`)
+    return res.send(buffer)
   }
 
   // Fallback: generate on-demand for invoices created before storage upload was introduced

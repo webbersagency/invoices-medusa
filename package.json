@@ -1,6 +1,6 @@
 {
   "name": "@webbers/invoices-medusa",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Add invoices to Medusa v2",
   "author": "Webbers B.V. <development@webbers.com>",
   "license": "MIT",
