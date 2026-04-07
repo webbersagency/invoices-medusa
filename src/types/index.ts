@@ -3,6 +3,7 @@ export interface InvoiceDTO {
   display_id: number
   resource_id: string
   type: "debit" | "credit" | "void"
+  pdf_url?: string | null
   parent_invoice?: InvoiceDTO | null
   metadata?: Record<string, unknown> | null
   created_at: Date
