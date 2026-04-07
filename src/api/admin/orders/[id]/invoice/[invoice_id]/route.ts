@@ -1,3 +1,4 @@
+import {pipeline} from "stream/promises"
 import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
@@ -19,9 +20,19 @@ export const GET = async (
   if (invoice.pdf_url) {
     const fileModuleService = req.scope.resolve(Modules.FILE)
     const stream = await fileModuleService.getDownloadStream(invoice.pdf_url)
+
     res.contentType("application/pdf")
     res.attachment(`invoice-${invoice.display_id}.pdf`)
-    return stream.pipe(res)
+
+    try {
+      await pipeline(stream, res)
+    } catch {
+      if (!res.headersSent) {
+        res.status(500).json({message: "Failed to stream invoice"})
+      }
+    }
+
+    return
   }
 
   // Fallback: generate on-demand for invoices created before storage upload was introduced
