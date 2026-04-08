@@ -22,7 +22,7 @@ export const GET = async (
     const stream = await fileModuleService.getDownloadStream(invoice.pdf_url)
 
     res.contentType("application/pdf")
-    res.attachment(`invoice-${invoice.display_id}.pdf`)
+    res.attachment(`${invoice.type === 'credit' ? 'credit': ''}invoice-${invoice.display_id}.pdf`)
 
     try {
       await pipeline(stream, res)
