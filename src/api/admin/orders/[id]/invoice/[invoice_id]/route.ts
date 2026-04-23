@@ -5,6 +5,7 @@ import {
 } from "@medusajs/framework/http"
 import {Modules} from "@medusajs/framework/utils"
 import {generateInvoicePdfWorkflow} from "../../../../../../workflows/generate-invoice-pdf"
+import {refreshInvoicePdfWorkflow} from "../../../../../../workflows/refresh-invoice-pdf"
 import {INVOICE_MODULE} from "../../../../../../modules/invoice"
 import InvoiceModuleService from "../../../../../../modules/invoice/service"
 
@@ -22,7 +23,7 @@ export const GET = async (
     const stream = await fileModuleService.getDownloadStream(invoice.pdf_url)
 
     res.contentType("application/pdf")
-    res.attachment(`${invoice.type === 'credit' ? 'credit': ''}invoice-${invoice.display_id}.pdf`)
+    res.attachment(`${invoice.type === 'credit' ? 'credit-': ''}invoice-${invoice.display_id}.pdf`)
 
     try {
       await pipeline(stream, res)
@@ -46,4 +47,20 @@ export const GET = async (
   res.contentType("application/pdf")
   res.attachment(result.fileName)
   res.send(Buffer.from(result.data, "base64"))
+}
+
+export const POST = async (
+  req: AuthenticatedMedusaRequest,
+  res: MedusaResponse
+) => {
+  const {id: orderId, invoice_id: invoiceId} = req.params
+
+  await refreshInvoicePdfWorkflow(req.scope).run({
+    input: {
+      order_id: orderId,
+      invoice_id: invoiceId,
+    },
+  })
+
+  res.status(200).json({id: invoiceId})
 }
