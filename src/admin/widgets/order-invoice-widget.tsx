@@ -1,10 +1,10 @@
 import React from "react"
 import {AdminOrder, DetailWidgetProps} from "@medusajs/types"
-import {Container, Heading, Text} from "@medusajs/ui"
+import {Container, Heading, IconButton, Text, toast} from "@medusajs/ui"
 import {defineWidgetConfig} from "@medusajs/admin-sdk"
 import {sdk} from "../lib/sdk"
-import {useQuery} from "@tanstack/react-query"
-import {ArrowDownTray} from "@medusajs/icons"
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
+import {ArrowDownTray, ArrowPath} from "@medusajs/icons"
 
 type Invoice = {
   created_at: string
@@ -17,6 +17,7 @@ type Invoice = {
 }
 
 const OrderInvoiceWidget = ({data: order}: DetailWidgetProps<AdminOrder>) => {
+  const queryClient = useQueryClient()
   const {
     data: expandedOrder,
     isLoading,
@@ -27,6 +28,20 @@ const OrderInvoiceWidget = ({data: order}: DetailWidgetProps<AdminOrder>) => {
         fields: "+invoices.*",
       }),
     queryKey: [order.id, "order_invoices"],
+  })
+
+  const refreshInvoice = useMutation({
+    mutationFn: (invoiceId: string) =>
+      sdk.client.fetch(`/admin/orders/${order.id}/invoice/${invoiceId}`, {
+        method: "POST",
+      }),
+    onSuccess: () => {
+      toast.success("Invoice PDF regenerated")
+      queryClient.invalidateQueries({queryKey: [order.id, "order_invoices"]})
+    },
+    onError: () => {
+      toast.error("Failed to regenerate invoice PDF")
+    },
   })
 
   const orderWithInvoices = expandedOrder?.order as AdminOrder & {
@@ -68,6 +83,18 @@ const OrderInvoiceWidget = ({data: order}: DetailWidgetProps<AdminOrder>) => {
                     <ArrowDownTray />
                     {invoice.display_id}.pdf
                   </a>
+                  <IconButton
+                    size="small"
+                    variant="transparent"
+                    disabled={
+                      refreshInvoice.isPending &&
+                      refreshInvoice.variables === invoice.id
+                    }
+                    onClick={() => refreshInvoice.mutate(invoice.id)}
+                    aria-label="Regenerate invoice PDF"
+                  >
+                    <ArrowPath />
+                  </IconButton>
                 </div>
               ))}
             </div>
