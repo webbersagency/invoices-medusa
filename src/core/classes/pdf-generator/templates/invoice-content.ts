@@ -438,23 +438,47 @@ const invoiceContent = async (
             },
           ],
           ...(order.discount_total && Number(order.discount_total) > 0
-            ? [
-                [
-                  {
-                    text: t.invoice.discount,
-                    bold: true,
-                    border: false,
-                    margin: [0, 2, 0, 5],
-                  },
-                  {
-                    text: `- ${fmt(Number(formatExclVat ? order.discount_subtotal : order.discount_total))}`,
-                    bold: true,
-                    border: false,
-                    alignment: "right",
-                    margin: [0, 2, 0, 5],
-                  },
-                ],
-              ]
+            ? (() => {
+                const adjMap = new Map<string, number>()
+                for (const item of order.items ?? []) {
+                  for (const adj of (item.adjustments ?? [])) {
+                    if (adj.code) {
+                      adjMap.set(adj.code, (adjMap.get(adj.code) ?? 0) + Number(adj.amount))
+                    }
+                  }
+                }
+                return adjMap.size > 0
+                  ? [...adjMap.entries()].map(([code, amount]) => [
+                      {
+                        text: `${t.invoice.discount} (${code})`,
+                        bold: true,
+                        border: false,
+                        margin: [0, 2, 0, 5],
+                      },
+                      {
+                        text: `- ${fmt(amount)}`,
+                        bold: true,
+                        border: false,
+                        alignment: "right",
+                        margin: [0, 2, 0, 5],
+                      },
+                    ])
+                  : [[
+                      {
+                        text: t.invoice.discount,
+                        bold: true,
+                        border: false,
+                        margin: [0, 2, 0, 5],
+                      },
+                      {
+                        text: `- ${fmt(Number(formatExclVat ? order.discount_subtotal : order.discount_total))}`,
+                        bold: true,
+                        border: false,
+                        alignment: "right",
+                        margin: [0, 2, 0, 5],
+                      },
+                    ]]
+              })()
             : []),
           [
             {
