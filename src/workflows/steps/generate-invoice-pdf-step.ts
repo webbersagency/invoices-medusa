@@ -45,6 +45,7 @@ export const generateInvoicePdfStep = createStep(
           "items.variant.inventory_items.*",
           "items.variant.inventory_items.inventory.*",
           "items.tax_lines.*",
+          "items.adjustments.*",
           "shipping_methods.*",
           "shipping_methods.tax_lines.*",
           "invoices.*",
