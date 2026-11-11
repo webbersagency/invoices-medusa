@@ -95,6 +95,7 @@ export default defineConfig({
 | `colors.text` | `string` | No | Table header text color (CSS hex). |
 | `header` | `Content` | No | pdfmake content block rendered as page header. Replaces the default logo header. |
 | `footer` | `Content` | No | pdfmake content block rendered as page footer. |
+| `shouldInvoiceOrder` | `(container, orderId) => boolean \| Promise<boolean>` | No | Called before an order is invoiced on fulfillment. Return `false` to skip that order. Without it every fulfilled order is invoiced. Invoices created on request are not affected. |
 
 ## How it works
 
