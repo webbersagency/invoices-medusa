@@ -1,4 +1,5 @@
 import {MedusaService} from "@medusajs/framework/utils"
+import {MedusaContainer} from "@medusajs/framework/types"
 import Invoice from "./models/invoice"
 import {z} from "@medusajs/framework/zod"
 import {Content} from "pdfmake/interfaces"
@@ -10,6 +11,22 @@ const addressFormatterSchema = z.custom<AddressFormatter>(
   (value): value is AddressFormatter => typeof value === "function",
   {
     message: "address must be a function",
+  }
+)
+
+/**
+ * Decides whether a fulfilled order gets an invoice automatically. Return false for orders the host
+ * invoices elsewhere or not at all. Invoices created on request are not affected.
+ */
+export type ShouldInvoiceOrder = (
+  container: MedusaContainer,
+  orderId: string
+) => boolean | Promise<boolean>
+
+const shouldInvoiceOrderSchema = z.custom<ShouldInvoiceOrder>(
+  (value): value is ShouldInvoiceOrder => typeof value === "function",
+  {
+    message: "shouldInvoiceOrder must be a function",
   }
 )
 
@@ -33,6 +50,7 @@ export const moduleOptionsSchema = z.object({
     .optional(),
   header: z.custom<Content>().optional(),
   footer: z.custom<Content>().optional(),
+  shouldInvoiceOrder: shouldInvoiceOrderSchema.optional(),
 })
 
 export type ModuleOptions = z.infer<typeof moduleOptionsSchema>

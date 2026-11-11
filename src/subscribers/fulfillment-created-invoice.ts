@@ -1,6 +1,8 @@
 import {SubscriberArgs, SubscriberConfig} from "@medusajs/framework"
 import {ContainerRegistrationKeys} from "@medusajs/framework/utils"
 import invoiceOrderLink from "../links/invoice-order"
+import {INVOICE_MODULE} from "../modules/invoice"
+import InvoiceModuleService from "../modules/invoice/service"
 import {createInvoiceWorkflow} from "../workflows/create-invoice"
 
 type FulfillmentCreatedData = {
@@ -30,6 +32,17 @@ export default async function fulfillmentCreatedInvoiceHandler({
     if (existing.length > 0) {
       logger.info(
         `[invoice] Invoice already exists for order ${order_id}, skipping`
+      )
+      return
+    }
+
+    const invoiceModuleService: InvoiceModuleService =
+      container.resolve(INVOICE_MODULE)
+    const {shouldInvoiceOrder} = invoiceModuleService.getOptions()
+
+    if (shouldInvoiceOrder && !(await shouldInvoiceOrder(container, order_id))) {
+      logger.info(
+        `[invoice] Order ${order_id} is not invoiced automatically, skipping`
       )
       return
     }
